@@ -1,14 +1,17 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as login_django
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import Pet
 
 
-def cadastro(request):
+
+def register(request):
     if request.method == "GET":
-        return render(request, 'cadastro.html')
+        return render(request, 'register.html')
     else:
         username = request.POST.get('username')
         email = request.POST.get('email')
@@ -23,7 +26,7 @@ def cadastro(request):
                                         password=senha)
         user.save()
 
-        return HttpResponse('Usuário cadastrado com sucesso')
+        return redirect('login')
     
 
 def login(request):
@@ -38,11 +41,40 @@ def login(request):
         if user:
             login_django(request, user)
 
-            return HttpResponse('autenticado')
+            return redirect('perfis_pet')
         else:
-            return HttpResponse('email ou senha invalidos')
+            messages.error(request, 'Usuário e senha inválido, Favor tentar novamente.')
+        return redirect('login')
 
 
 @login_required(login_url="/auth/login/")
 def plataforma(request):
-    return HttpResponse('plataforma')
+    return render(request, 'pet.html')
+
+
+def perfis_pet(request):
+    pet = Pet.objects.filter(active=True)
+    return render(request, 'pet.html', {'pet': pet})
+
+
+def todo_list(request):
+    return render(request, 'todo_list.html', {})
+
+
+def register_pet(request):
+    return render(request, 'register_pet.html')
+
+
+@login_required(login_url='/login/')
+def set_pet(request):
+    name = request.POST.get('name')
+    email = request.POST.get('email')
+    phone = request.POST.get('phone')
+    city = request.POST.get('city')
+    description = request.POST.get('description')
+    file = request.FILES.get('file')
+    user = request.user
+    pet = Pet.objects.create(name=name, email=email, phone=phone, description=description, photo=file, user=user, city=city)
+    
+    return redirect(request,'/')
+    

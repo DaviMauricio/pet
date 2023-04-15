@@ -29,14 +29,26 @@
     </nav>
 </div> 
 
-{% for p in pet %}
-    <p>{{ p.city }}</p>
-    {{ p.description }}
-{% endfor %}
+<div class="container">
+    <div class="row">
+        {% for p in pet %}
+        <div class="col-sm-4">
+            <div class="polaroid">
+               <img src="{{ p.photo }}" alt="foto-pet"> 
+                <div class="container">
+                    <p>{{ p.name }}</p>
+                </div>
+            </div>
+            
+
+        </div>
+        {% endfor %}
+    </div>
+</div>
 
 <div class="nav ">
     <li class="nav-item">
-        <button href="nav-link" href="#">Cadastrar</button>
+        <button href="nav-link"><a href="register">Cadastrar</a></button>
     </li>
 </div>
 
